@@ -23,7 +23,7 @@ const ListCards = () => {
 			<Container >
 				<Row>
 					<Col xs={2}>
-						<h4 className='text-center'>Cartas {playerOne.name}</h4>
+						<h4 className='text-center'>{playerOne.name}</h4>
 						<Row>
 							<h5 className='text-center'>Player 1</h5>
 							<div className='text-center'>

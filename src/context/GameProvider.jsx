@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import DeckOfCardsAPI from '../services/deckofcardsapi';
 import GameContext from './GameContext';
@@ -9,6 +10,9 @@ const GameProvider = ({ children }) => {
 	const [winName, setWinName] = useState('');
 	const [newCard, setNewCard] = useState({playerOne:{},playerTwo:{}});
 	const [acceptedCard, setacceptedCard] = useState({playerOne:false,playerTwo:false});
+	const numbers=["2", "3", "4", "5", "6", "7", "8", "9", "10"];
+	let validatePlayer1=null;
+	let validatePlayer2=null;
 	const [playerOne, setPlayerOne] = useState({
 		name: '',
 		cards: [],
@@ -25,6 +29,17 @@ const GameProvider = ({ children }) => {
 		}
 	}, [idGame]);
 
+	useEffect(() => {
+		validatePlayer1=validateBaraja(playerOne.cards);
+		validatePlayer2=validateBaraja(playerTwo.cards);
+		if (validatePlayer1 || validatePlayer2) {
+			// alert("alguien ganoop")
+			setWin(true);
+			setShowToast(true);
+			setWinName(validatePlayer1 ? playerOne.name : playerTwo.name);
+		}
+	}, [playerOne.cards,playerTwo.cards]);
+
 
 	const playGame = async () => {
 		setIdGame(await DeckOfCardsAPI.getIdGame());
@@ -36,7 +51,8 @@ const GameProvider = ({ children }) => {
 	};
 
 	const addCardsToPlayers = async()=>{
-		handleCardsPlayers(await requestCards(20));
+		const cards=await requestCards(20);
+		handleCardsPlayers(cards);
 	}
 
 	const handleCardsPlayers = (cards,player=null,id=null) => {
@@ -59,23 +75,9 @@ const GameProvider = ({ children }) => {
 				setacceptedCard({...acceptedCard,playerTwo:false})
 			}
 		}
-
-		// const findCardPlayerOne = playerOne.cards.find(
-		// 	card => card.value === cards[0].value
-		// );
-
-		// const findCardPlayerTwo = playerTwo.cards.find(
-		// 	card => card.value === cards[1].value
-		// );
-
-		// if (findCardPlayerOne || findCardPlayerTwo) {
-		// 	setWin(true);
-		// 	setShowToast(true);
-		// 	setWinName(findCardPlayerOne ? playerOne.name : playerTwo.name);
-		// }
 	};
 
-	const selectCard=async(indexCardSelected,player=null,flag=false)=>{
+	const selectCard=(indexCardSelected,player=null,flag=false)=>{
 		if(flag){
 			if(player==1){
 				handleCardsPlayers(null,player,indexCardSelected);
@@ -85,10 +87,23 @@ const GameProvider = ({ children }) => {
 		}
 	}
 
-	const validateTerna = () => {};
-	const validateCuarta = () => {};
-	const validateEscalera = () => {};
-	
+	const validateTerna = (cards) => {
+		const numberCards = cards.filter((card)=>numbers.includes(card.value)).sort((a,b)=>a.value-b.value)
+		const uniqueCards=new Set([...numberCards.map(({value})=>value)]);
+		let isWinner=false;
+		uniqueCards.forEach((card)=>{
+			if(numberCards.filter(cardNumber=>card==cardNumber.value).length>=3){
+				isWinner=true;
+			}
+		});
+		return isWinner;
+	};
+	const validateCuarta = (cards) => false;
+	const validateEscalera = (cards) => false;
+
+	const validateBaraja = (cards) => {
+		return validateTerna(cards) || validateCuarta (cards) || validateEscalera(cards);
+	};
 
 	return (
 		<GameContext.Provider
