@@ -27,7 +27,6 @@ const FormLogin = () => {
 			console.log(form);
 		} else {
 			await playGame();
-			// await requestCards(20);
 			navigate('/game', { replace: false });
 		}
 		setValidated(true);

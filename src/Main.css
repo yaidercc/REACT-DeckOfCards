@@ -1,0 +1,10 @@
+@keyframes example {
+    0% {font-size: 18px;}
+    50%{font-size: 25px;}
+    100% {font-size: 18px;}
+}
+
+.animateText{
+    animation: example 1s infinite;
+
+}
