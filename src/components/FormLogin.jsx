@@ -7,10 +7,10 @@ import Row from 'react-bootstrap/Row';
 import { TfiGame } from 'react-icons/tfi';
 import { useNavigate } from 'react-router-dom';
 import useGame from '../hooks/useGame';
+import DeckOfCardsAPI from '../services/deckofcardsapi';
 
 const FormLogin = () => {
-	const { playerOne, setPlayerOne, playerTwo, setPlayerTwo, playGame } =
-		useGame();
+	const { playerOne, setPlayerOne, playerTwo, setPlayerTwo, playGame ,requestCards} = useGame();
 	const [validated, setValidated] = useState(false);
 	const navigate = useNavigate();
 
@@ -27,7 +27,8 @@ const FormLogin = () => {
 			console.log(form);
 		} else {
 			await playGame();
-			navigate('/game', { replace: true });
+			// await requestCards(20);
+			navigate('/game', { replace: false });
 		}
 		setValidated(true);
 	};

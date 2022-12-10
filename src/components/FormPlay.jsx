@@ -4,7 +4,7 @@ import useGame from '../hooks/useGame';
 const FormPlay = () => {
 	const { requestCards } = useGame();
 	const handleClick = async () => {
-		await requestCards();
+		await requestCards(2);
 	};
 	return (
 		<Stack gap={2} className='col-md-5 mx-auto'>

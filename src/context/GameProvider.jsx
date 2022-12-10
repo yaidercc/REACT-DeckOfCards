@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DeckOfCardsAPI from '../services/deckofcardsapi';
 import GameContext from './GameContext';
 
@@ -7,23 +7,33 @@ const GameProvider = ({ children }) => {
 	const [win, setWin] = useState(false);
 	const [showToast, setShowToast] = useState(false);
 	const [winName, setWinName] = useState('');
+
 	const [playerOne, setPlayerOne] = useState({
 		name: '',
 		cards: [],
 	});
+
 	const [playerTwo, setPlayerTwo] = useState({
 		name: '',
 		cards: [],
 	});
 
+	useEffect(() => {
+		if(idGame) requestCards(20);
+	}, [idGame])
+	
+
 	const playGame = async () => {
 		setIdGame(await DeckOfCardsAPI.getIdGame());
+		
 	};
 
-	const requestCards = async () => {
-		const cards = await DeckOfCardsAPI.getCards(idGame);
-		setPlayerOne({ ...playerOne, cards: [...playerOne.cards, cards[0]] });
-		setPlayerTwo({ ...playerTwo, cards: [...playerTwo.cards, cards[1]] });
+	const requestCards = async (numberCards) => {
+		const cards = await DeckOfCardsAPI.getCards(idGame,numberCards);
+		const cardsDivide = [cards?.slice(0,cards.length/2),cards?.slice(cards.length/2)];
+
+		setPlayerOne({ ...playerOne, cards: [...playerOne.cards, ...cardsDivide[0]] });
+		setPlayerTwo({ ...playerTwo, cards: [...playerTwo.cards, ...cardsDivide[1]] });
 
 		const findCardPlayerOne = playerOne.cards.find(
 			card => card.value === cards[0].value
@@ -39,6 +49,10 @@ const GameProvider = ({ children }) => {
 			setWinName(findCardPlayerOne ? playerOne.name : playerTwo.name);
 		}
 	};
+
+	const validateTerna=()=>{}
+	const validateCuarta=()=>{}
+	const validateEscalera=()=>{}
 
 	return (
 		<GameContext.Provider

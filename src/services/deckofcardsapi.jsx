@@ -5,8 +5,8 @@ const getIdGame = async () => {
 	return data?.deck_id;
 };
 
-const getCards = async deckId => {
-	const url = `https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=2`;
+const getCards = async (deckId,numberCards) => {
+	const url = `https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=${numberCards}`;
 	const res = await fetch(url);
 	const data = await res.json();
 	return data?.cards;
