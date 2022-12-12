@@ -9,6 +9,7 @@ const ListCards = () => {
 	const { playerOne, playerTwo, newCard, selectCard,setNewCard,acceptedCard,setacceptedCard } = useGame();
 	
 	const handlewNewCard=(player,flag)=>{
+		
 		if(flag){
 			setacceptedCard({...acceptedCard,[player]:true})
 		}else{
@@ -16,6 +17,7 @@ const ListCards = () => {
 				...newCard,
 				[player]:{}
 			})
+			setacceptedCard({...acceptedCard,[player]:false})
 		}
 	}
 	return (
@@ -56,7 +58,7 @@ const ListCards = () => {
 							<div className='justify-content-md-center'>
 								{playerOne.cards.map((card, index) => (
 									<img
-										className='col-sm-4 col-lg-3 mx-2 my-2'
+										className='col-sm-4 col-lg-3 mx-2 my-2 '
 										src={card.image}
 										alt={card.value}
 										key={index}

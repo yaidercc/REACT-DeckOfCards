@@ -11,6 +11,7 @@
     "lint": "eslint --fix . --ext .js,jsx"
   },
   "dependencies": {
+    "animate.css": "^4.1.1",
     "bootstrap": "^5.2.3",
     "react": "^18.2.0",
     "react-bootstrap": "^2.6.0",

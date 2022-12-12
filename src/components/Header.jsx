@@ -7,7 +7,7 @@ const Header = () => {
 		<Navbar bg='dark' variant='dark'>
 			<Container>
 				<Navbar.Brand>
-					<div className='d-inline-block align-top'>
+					<div className='d-inline-block align-top '>
 						<TfiGame />
 					</div>{' '}
 					Deck Of Cards Game
