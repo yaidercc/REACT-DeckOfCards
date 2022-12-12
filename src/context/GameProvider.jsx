@@ -7,13 +7,16 @@ const GameProvider = ({ children }) => {
 	const [win, setWin] = useState(false);
 	const [showToast, setShowToast] = useState(false);
 	const [winName, setWinName] = useState('');
-	const [newCard, setNewCard] = useState({ playerOne: {}, playerTwo: {} });
+	const [newCard, setNewCard] = useState({ playerOne: [], playerTwo: [] });
 	const [cardsRemaninig, setcardsRemaninig] = useState(0);
+	const [turn, setTurn] = useState({
+		playerOne: 16,
+		playerTwo: 16,
+	});
 	const [acceptedCard, setacceptedCard] = useState({
 		playerOne: false,
 		playerTwo: false,
 	});
-
 
 	let validatePlayer1 = null;
 	let validatePlayer2 = null;
@@ -49,8 +52,17 @@ const GameProvider = ({ children }) => {
 
 	const requestCards = async numberCards => {
 		const cards = await DeckOfCardsAPI.getCards(idGame, numberCards);
-		console.log(cards);
-		return [cards?.cards.slice(0, cards?.cards.length / 2), cards?.cards.slice(cards?.cards.length / 2),cards.remaining];
+		let divideCards = [];
+		if (numberCards > 1) {
+			divideCards = [
+				cards?.cards.slice(0, cards?.cards.length / 2),
+				cards?.cards.slice(cards?.cards.length / 2),
+				cards.remaining,
+			];
+		} else {
+			divideCards = [cards?.cards[0], 0, cards.remaining];
+		}
+		return divideCards;
 	};
 
 	const addCardsToPlayers = async () => {
@@ -68,14 +80,14 @@ const GameProvider = ({ children }) => {
 				const newCards = playerOne.cards.filter((card, i) => i != id);
 				newCards.push(...newCard.playerOne);
 				setPlayerOne({ ...playerOne, cards: [...newCards] });
-				setNewCard({ ...newCard, playerOne: {} });
+				setNewCard({ ...newCard, playerOne: [] });
 				setacceptedCard({ ...acceptedCard, playerOne: false });
 			}
 			if (player == 2) {
 				const newCards = playerTwo.cards.filter((card, i) => i != id);
 				newCards.push(...newCard.playerTwo);
 				setPlayerTwo({ ...playerTwo, cards: [...newCards] });
-				setNewCard({ ...newCard, playerTwo: {} });
+				setNewCard({ ...newCard, playerTwo: [] });
 				setacceptedCard({ ...acceptedCard, playerTwo: false });
 			}
 		}
@@ -160,29 +172,63 @@ const GameProvider = ({ children }) => {
 				sortedCards.push(card);
 			}
 		});
+		console.log(sortedCards);
 		sortedCards.map((card, i) => {
-			if (i < sortedCards.length - 1) {
-				// Get the index of the current and next ranks in the ranks array
-				const currIndex = cardsSimbols.indexOf(sortedCards[i].value);
-				const nextIndex = cardsSimbols.indexOf(sortedCards[i + 1].value);
-
-				// If the difference between the indices is not 1, return false
-				if (nextIndex - currIndex !== 1) {
-					if (escalera.length < 3) {
-						escalera = [];
-						escalera.push(sortedCards[i + 1]);
-					}
-				} else {
-					if(escalera.length<3){
-						if(escalera.filter(cardEscalera=>cardEscalera.suit==sortedCards[i + 1].suit).length==0){
-							escalera=[];
+			// if (i < sortedCards.length - 1) {
+			// Get the index of the current and next ranks in the ranks array
+			// const currIndex = cardsSimbols.indexOf(sortedCards[i].value);
+			// const nextIndex = cardsSimbols.indexOf(sortedCards[i + 1].value);
+			if (escalera.length < 3) {
+				escalera = sortedCards.filter(cardSorts => {
+					if (cardSorts.suit == card.suit) {
+						if (
+							[0, 1].includes(
+								cardsSimbols.indexOf(cardSorts.value) -
+									cardsSimbols.indexOf(card.value)
+							)
+						) {
+							console.log('valor actual: ' + card.suit, card.value);
+							console.log(
+								'valor encontrado: ' + cardSorts.suit,
+								cardSorts.value
+							);
+							return true;
+						} else {
+							return false;
 						}
-						escalera.push(sortedCards[i + 1]);
+					} else {
+						return false;
 					}
-				}
+				});
 			}
+			// // If the difference between the indices is not 1, return false
+			// if (nextIndex - currIndex !== 1) {
+			// 	if (escalera.length < 3) {
+			// 		escalera = [];
+			// 		escalera.push(sortedCards[i + 1]);
+			// 	}
+			// } else {
+			// 	if (escalera.length < 3) {
+			// 		if (
+			// 			escalera.filter(
+			// 				cardEscalera => cardEscalera.suit == sortedCards[i + 1].suit
+			// 			).length == 0
+			// 		) {
+			// 			if(sortedCards[i + 1].suit==){
+
+			// 				escalera = [];
+			// 			}
+			// 		}
+			// 		escalera.push(sortedCards[i + 1]);
+			// 	}
+			// }
+			// }
 		});
-		return escalera.length>=3;
+		console.log('result');
+		// console.log(escalera)
+		console.log('===============');
+		return escalera.length >= 3;
+		// return false;
 	};
 
 	const validateBaraja = cards => {
@@ -209,7 +255,9 @@ const GameProvider = ({ children }) => {
 				acceptedCard,
 				setacceptedCard,
 				cardsRemaninig,
-				setcardsRemaninig
+				setcardsRemaninig,
+				turn,
+				setTurn,
 			}}
 		>
 			{children}

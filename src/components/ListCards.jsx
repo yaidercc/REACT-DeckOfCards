@@ -2,51 +2,86 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import useGame from '../hooks/useGame';
-import { BsFillXCircleFill,BsFillCheckCircleFill } from 'react-icons/bs';
-import { ShowNewCard } from './showNewCard';
-import { useState } from 'react';
+import { BsFillXCircleFill, BsFillCheckCircleFill } from 'react-icons/bs';
 const ListCards = () => {
-	const { playerOne, playerTwo, newCard, selectCard,setNewCard,acceptedCard,setacceptedCard } = useGame();
-	
-	const handlewNewCard=(player,flag)=>{
-		
-		if(flag){
-			setacceptedCard({...acceptedCard,[player]:true})
+	const {
+		playerOne,
+		playerTwo,
+		newCard,
+		selectCard,
+		setNewCard,
+		acceptedCard,
+		setacceptedCard,
+		turn,
+		setTurn,
+	} = useGame();
+
+	const handlewNewCard = (player, flag,playerName) => {
+		if (turn[player] > 0) {
+			if (flag) {
+				setacceptedCard({ ...acceptedCard, [player]: true });
+			} else {
+				setNewCard({
+					...newCard,
+					[player]: {},
+				});
+				setacceptedCard({ ...acceptedCard, [player]: false });
+			}
+			setTurn({
+				...turn,
+				[player]: turn[player] - 1,
+			});
 		}else{
-			setNewCard({
-				...newCard,
-				[player]:{}
-			})
-			setacceptedCard({...acceptedCard,[player]:false})
+			alert(`No hay turnos disponibles para el jugador: ${playerName}`)
 		}
-	}
+	};
 	return (
 		<>
-			<Container >
+			<Container>
 				<Row>
 					<Col xs={2}>
 						<h4 className='text-center'> Cards Player {playerOne.name}</h4>
 						<Row>
+							<h5 className='text-center'> Turnos: {turn.playerOne}</h5>
 							<div className='text-center'>
 								<img
 									src={newCard.playerOne[0]?.image}
 									alt={newCard.playerOne[0]?.value}
 									height={200}
 								/>
-								{newCard.playerOne[0]?.image && 
-									(<>
+								{newCard.playerOne[0]?.image && (
+									<>
 										<div className='d-flex justify-content-around mt-3'>
-											<button className='bg-transparent border none' onClick={()=>handlewNewCard("playerOne",true,newCard.playerOne[0])}>
-												<BsFillCheckCircleFill className='fs-3 text-success'/>
+											<button
+												className='bg-transparent border none'
+												onClick={() =>
+													handlewNewCard(
+														'playerOne',
+														true,
+														playerOne.name
+													)
+												}
+											>
+												<BsFillCheckCircleFill className='fs-3 text-success' />
 											</button>
-											<button className='bg-transparent border none' onClick={()=>handlewNewCard("playerOne",false,newCard.playerOne[0])}>
-												<BsFillXCircleFill className='fs-3 text-danger'/>
+											<button
+												className='bg-transparent border none'
+												onClick={() =>
+													handlewNewCard(
+														'playerOne',
+														false,
+														playerOne.name
+													)
+												}
+											>
+												<BsFillXCircleFill className='fs-3 text-danger' />
 											</button>
 										</div>
-										{acceptedCard.playerOne &&  <p className='animateText'>Selecciona una carta!</p>}
-										</>
-									)
-								}
+										{acceptedCard.playerOne && (
+											<p className='animateText'>Selecciona una carta!</p>
+										)}
+									</>
+								)}
 							</div>
 						</Row>
 					</Col>
@@ -61,7 +96,7 @@ const ListCards = () => {
 										src={card.image}
 										alt={card.value}
 										key={index}
-										onClick={() => selectCard(index,1,acceptedCard.playerOne)}
+										onClick={() => selectCard(index, 1, acceptedCard.playerOne)}
 									/>
 								))}
 							</div>
@@ -81,7 +116,7 @@ const ListCards = () => {
 										key={index}
 										src={card.image}
 										alt={card.value}
-										onClick={() => selectCard(index,2,acceptedCard.playerTwo)}
+										onClick={() => selectCard(index, 2, acceptedCard.playerTwo)}
 									/>
 								))}
 							</div>
@@ -90,31 +125,48 @@ const ListCards = () => {
 					<Col xs={2}>
 						<h4 className='text-center'>Cards Player {playerTwo.name}</h4>
 						<Row>
+							<h5 className='text-center'> Turnos: {turn.playerTwo}</h5>
 							<div className='text-center'>
 								<img
 									src={newCard.playerTwo[0]?.image}
 									alt={newCard.playerTwo[0]?.value}
 									height={200}
 								/>
-								{newCard.playerTwo[0]?.image && 
-									(
-										<>
-											<div className='d-flex justify-content-evenly mt-3'>
-												<button className='bg-transparent border none' onClick={()=>handlewNewCard("playerTwo",true,newCard.playerTwo[0])}>
-													<BsFillCheckCircleFill className='fs-3 text-success'/>
-												</button>
-												<button className='bg-transparent border none' onClick={()=>handlewNewCard("playerTwo",false,newCard.playerTwo[0])}>
-													<BsFillXCircleFill className='fs-3 text-danger'/>
-												</button>
-											</div>
-											{acceptedCard.playerTwo &&  <p className='animateText'>Selecciona una carta!</p>}
-										</>
-									)
-								}
+								{newCard.playerTwo[0]?.image && (
+									<>
+										<div className='d-flex justify-content-evenly mt-3'>
+											<button
+												className='bg-transparent border none'
+												onClick={() =>
+													handlewNewCard(
+														'playerTwo',
+														true,
+														playerTwo.name
+													)
+												}
+											>
+												<BsFillCheckCircleFill className='fs-3 text-success' />
+											</button>
+											<button
+												className='bg-transparent border none'
+												onClick={() =>
+													handlewNewCard(
+														'playerTwo',
+														false,
+														playerTwo.name
+													)
+												}
+											>
+												<BsFillXCircleFill className='fs-3 text-danger' />
+											</button>
+										</div>
+										{acceptedCard.playerTwo && (
+											<p className='animateText'>Selecciona una carta!</p>
+										)}
+									</>
+								)}
 							</div>
 						</Row>
-
-						
 					</Col>
 				</Row>
 			</Container>
