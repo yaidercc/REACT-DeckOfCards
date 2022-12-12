@@ -9,7 +9,7 @@ const getCards = async (deckId,numberCards) => {
 	const url = `https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=${numberCards}`;
 	const res = await fetch(url);
 	const data = await res.json();
-	return data?.cards;
+	return {cards:data?.cards,remaining:data.remaining};
 };
 
 const DeckOfCardsAPI = {

@@ -8,10 +8,12 @@ const GameProvider = ({ children }) => {
 	const [showToast, setShowToast] = useState(false);
 	const [winName, setWinName] = useState('');
 	const [newCard, setNewCard] = useState({ playerOne: {}, playerTwo: {} });
+	const [cardsRemaninig, setcardsRemaninig] = useState(0);
 	const [acceptedCard, setacceptedCard] = useState({
 		playerOne: false,
 		playerTwo: false,
 	});
+
 
 	let validatePlayer1 = null;
 	let validatePlayer2 = null;
@@ -47,11 +49,13 @@ const GameProvider = ({ children }) => {
 
 	const requestCards = async numberCards => {
 		const cards = await DeckOfCardsAPI.getCards(idGame, numberCards);
-		return [cards?.slice(0, cards.length / 2), cards?.slice(cards.length / 2)];
+		console.log(cards);
+		return [cards?.cards.slice(0, cards?.cards.length / 2), cards?.cards.slice(cards?.cards.length / 2),cards.remaining];
 	};
 
 	const addCardsToPlayers = async () => {
 		const cards = await requestCards(20);
+		setcardsRemaninig(cards[2]);
 		handleCardsPlayers(cards);
 	};
 
@@ -119,7 +123,7 @@ const GameProvider = ({ children }) => {
 		return isWinner;
 	};
 	const validateEscalera = cards => {
-		const ranks = [
+		const cardsSimbols = [
 			'ACE',
 			'2',
 			'3',
@@ -134,19 +138,18 @@ const GameProvider = ({ children }) => {
 			'QUEEN',
 			'KING',
 		];
-		
+
 		const uniqueCards = cards.map(({ value, suit }) => ({ value, suit }));
-		// Create an array of the ranks of the cards, in the same order as they were received
 
 		const sortedCards = [];
 		let escalera = [];
-		// Sort the ranks in ascending order
+
 		uniqueCards.map((card, index) => {
-			const indexInRanks = ranks.indexOf(card.value);
+			const indexInRanks = cardsSimbols.indexOf(card.value);
 			if (index > 0) {
 				let flag = true;
 				for (let i = 0; i < index; i++) {
-					if (ranks.indexOf(sortedCards[i].value) >= indexInRanks) {
+					if (cardsSimbols.indexOf(sortedCards[i].value) >= indexInRanks) {
 						sortedCards.splice(i, 0, card);
 						flag = false;
 						break;
@@ -160,8 +163,8 @@ const GameProvider = ({ children }) => {
 		sortedCards.map((card, i) => {
 			if (i < sortedCards.length - 1) {
 				// Get the index of the current and next ranks in the ranks array
-				const currIndex = ranks.indexOf(sortedCards[i].value);
-				const nextIndex = ranks.indexOf(sortedCards[i + 1].value);
+				const currIndex = cardsSimbols.indexOf(sortedCards[i].value);
+				const nextIndex = cardsSimbols.indexOf(sortedCards[i + 1].value);
 
 				// If the difference between the indices is not 1, return false
 				if (nextIndex - currIndex !== 1) {
@@ -179,9 +182,6 @@ const GameProvider = ({ children }) => {
 				}
 			}
 		});
-		console.log('Resultado: ');
-		console.log(escalera);
-		console.log("=======================================");
 		return escalera.length>=3;
 	};
 
@@ -208,6 +208,8 @@ const GameProvider = ({ children }) => {
 				selectCard,
 				acceptedCard,
 				setacceptedCard,
+				cardsRemaninig,
+				setcardsRemaninig
 			}}
 		>
 			{children}

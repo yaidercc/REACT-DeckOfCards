@@ -5,12 +5,13 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
 import { TfiGame } from 'react-icons/tfi';
+
 import { useNavigate } from 'react-router-dom';
 import useGame from '../hooks/useGame';
 import DeckOfCardsAPI from '../services/deckofcardsapi';
 
 const FormLogin = () => {
-	const { playerOne, setPlayerOne, playerTwo, setPlayerTwo, playGame ,requestCards} = useGame();
+	const { playerOne, setPlayerOne, playerTwo, setPlayerTwo, playGame} = useGame();
 	const [validated, setValidated] = useState(false);
 	const navigate = useNavigate();
 
@@ -26,8 +27,15 @@ const FormLogin = () => {
 		if (form.checkValidity() === false) {
 			console.log(form);
 		} else {
-			await playGame();
-			navigate('/game', { replace: false });
+			if(playerOne.name!=playerTwo.name){
+				await playGame();
+				navigate('/game', { replace: false });
+			}else{
+				alert("Los nombres de los jugadores deben ser diferentes.");
+				setPlayerOne({...playerOne,name:''});
+				setPlayerTwo({...playerTwo,name:''});
+			}
+			
 		}
 		setValidated(true);
 	};

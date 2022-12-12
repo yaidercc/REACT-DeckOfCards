@@ -25,9 +25,8 @@ const ListCards = () => {
 			<Container >
 				<Row>
 					<Col xs={2}>
-						<h4 className='text-center'>{playerOne.name}</h4>
+						<h4 className='text-center'> Cards Player {playerOne.name}</h4>
 						<Row>
-							<h5 className='text-center'>Player 1</h5>
 							<div className='text-center'>
 								<img
 									src={newCard.playerOne[0]?.image}
@@ -88,10 +87,9 @@ const ListCards = () => {
 							</div>
 						</div>
 					</Col>
-					<Col xs={3}>
-						<h4 className='text-center'>{playerTwo.name}</h4>
+					<Col xs={2}>
+						<h4 className='text-center'>Cards Player {playerTwo.name}</h4>
 						<Row>
-							<h5 className='text-center'>Player 2</h5>
 							<div className='text-center'>
 								<img
 									src={newCard.playerTwo[0]?.image}
