@@ -39,10 +39,16 @@ const GameProvider = ({ children }) => {
 	useEffect(() => {
 		validatePlayer1 = validateBaraja(playerOne.cards);
 		validatePlayer2 = validateBaraja(playerTwo.cards);
-		if (validatePlayer1 || validatePlayer2) {
+		if (validatePlayer1.win && validatePlayer2.win) {
 			setWin(true);
 			setShowToast(true);
-			setWinName(validatePlayer1 ? playerOne.name : playerTwo.name);
+			setWinName(validatePlayer1.isEscalera ? playerOne.name : playerTwo.name);
+		} else {
+			if (validatePlayer1.win || validatePlayer2.win) {
+				setWin(true);
+				setShowToast(true);
+				setWinName(validatePlayer1.win ? playerOne.name : playerTwo.name);
+			}
 		}
 	}, [playerOne.cards, playerTwo.cards]);
 
@@ -108,31 +114,45 @@ const GameProvider = ({ children }) => {
 		const numberCards = cards
 			.filter(card => numbers.includes(card.value))
 			.sort((a, b) => a.value - b.value);
-		const uniqueCards = new Set([...numberCards.map(({ value }) => value)]);
-		let isWinner = false;
+		const uniqueCards = [
+			...new Set([...numberCards.map(({ value }) => value)]),
+		];
+		let countTerna = 0;
+		let isEscalera = false;
 		uniqueCards.forEach(card => {
 			if (
 				numberCards.filter(cardNumber => card == cardNumber.value).length == 3
 			) {
-				isWinner = true;
+				countTerna++;
+			} else {
+				if (validateEscalera(cards) == 3) {
+					countTerna++;
+					isEscalera = true;
+				}
 			}
 		});
-		return isWinner;
+
+		return { countTerna, isEscalera };
 	};
 	const validateCuarta = cards => {
 		const uniqueValues = new Set([...cards.map(({ value }) => value)]);
 		const uniqueFigure = new Set([...cards.map(({ suit }) => suit)]);
-		let isWinner = false;
+		let countCuarta = 0;
+		let isEscalera = false;
 		uniqueValues.forEach((card, i) => {
 			if (
 				cards.filter(cardNumber => card == cardNumber.value).length == 4 ||
 				cards.filter(cardFigure => uniqueFigure[i] == cardFigure.suit).length ==
 					4
 			) {
-				isWinner = true;
+				countCuarta++;
 			}
 		});
-		return isWinner;
+		if (countCuarta==0 && validateEscalera(cards) == 4) {
+			countCuarta++;
+			isEscalera = true;
+		}
+		return { countCuarta, isEscalera };
 	};
 	const validateEscalera = cards => {
 		const cardsSimbols = [
@@ -154,7 +174,7 @@ const GameProvider = ({ children }) => {
 		const uniqueCards = cards.map(({ value, suit }) => ({ value, suit }));
 
 		const sortedCards = [];
-		let escalera = [];
+		const escalera = [];
 
 		uniqueCards.map((card, index) => {
 			const indexInRanks = cardsSimbols.indexOf(card.value);
@@ -172,39 +192,48 @@ const GameProvider = ({ children }) => {
 				sortedCards.push(card);
 			}
 		});
-		console.log(sortedCards);
 		sortedCards.map((card, i) => {
 			if (escalera.length < 3) {
-				escalera = sortedCards.filter(cardSorts => {
-					if (cardSorts.suit == card.suit) {
-						if (
-							[0, 1].includes(
-								cardsSimbols.indexOf(cardSorts.value) -
-									cardsSimbols.indexOf(card.value)
-							)
-						) {
-							console.log('valor actual: ' + card.suit, card.value);
-							console.log(
-								'valor encontrado: ' + cardSorts.suit,
-								cardSorts.value
-							);
-							return true;
-						} else {
-							return false;
-						}
-					} else {
-						return false;
+				let nextCard=card;
+				escalera.push(card);
+				sortedCards.map(cardSorts => {
+					// if (cardSorts.suit == card.suit) {
+					if (cardsSimbols.indexOf(cardSorts.value) - cardsSimbols.indexOf(nextCard.value) == 1) {
+						escalera.push(cardSorts);
+						nextCard=cardSorts;
 					}
+					// } else {
+					// 	return false;
+					// }
 				});
 			}
 		});
-		return escalera.length >= 3;
+		return escalera.length;
 	};
 
 	const validateBaraja = cards => {
-		return (
-			validateTerna(cards) || validateCuarta(cards) || validateEscalera(cards)
-		);
+		const results = {
+			terna: validateTerna(cards).countTerna,
+			cuarta: validateCuarta(cards).countCuarta,
+			escalera:
+				validateCuarta(cards).isEscalera || validateTerna(cards).isEscalera,
+		};
+		if (results.terna == 2 && results.cuarta == 1) {
+			if (results.escalera) {
+				return {
+					escalera: true,
+					win: true,
+				};
+			}
+			return {
+				escalera: false,
+				win: true,
+			};
+		}
+		return {
+			escalera: false,
+			win: false,
+		};
 	};
 
 	return (
