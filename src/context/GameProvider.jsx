@@ -82,15 +82,15 @@ const GameProvider = ({ children }) => {
 			setPlayerOne({ ...playerOne, cards: [...playerOne.cards, ...cards[0]] });
 			setPlayerTwo({ ...playerTwo, cards: [...playerTwo.cards, ...cards[1]] });
 		} else {
-			if (player == 1) {
-				const newCards = playerOne.cards.filter((card, i) => i != id);
+			if (player === 1) {
+				const newCards = playerOne.cards.filter((card, i) => i !== id);
 				newCards.push(...newCard.playerOne);
 				setPlayerOne({ ...playerOne, cards: [...newCards] });
 				setNewCard({ ...newCard, playerOne: [] });
 				setacceptedCard({ ...acceptedCard, playerOne: false });
 			}
-			if (player == 2) {
-				const newCards = playerTwo.cards.filter((card, i) => i != id);
+			if (player === 2) {
+				const newCards = playerTwo.cards.filter((card, i) => i !== id);
 				newCards.push(...newCard.playerTwo);
 				setPlayerTwo({ ...playerTwo, cards: [...newCards] });
 				setNewCard({ ...newCard, playerTwo: [] });
@@ -101,7 +101,7 @@ const GameProvider = ({ children }) => {
 
 	const selectCard = (indexCardSelected, player = null, flag = false) => {
 		if (flag) {
-			if (player == 1) {
+			if (player === 1) {
 				handleCardsPlayers(null, player, indexCardSelected);
 			} else {
 				handleCardsPlayers(null, player, indexCardSelected);
@@ -121,11 +121,11 @@ const GameProvider = ({ children }) => {
 		let isEscalera = false;
 		uniqueCards.forEach(card => {
 			if (
-				numberCards.filter(cardNumber => card == cardNumber.value).length == 3
+				numberCards.filter(cardNumber => card === cardNumber.value).length === 3
 			) {
 				countTerna++;
 			} else {
-				if (validateEscalera(cards) == 3) {
+				if (validateEscalera(cards) === 3) {
 					countTerna++;
 					isEscalera = true;
 				}
@@ -141,14 +141,14 @@ const GameProvider = ({ children }) => {
 		let isEscalera = false;
 		uniqueValues.forEach((card, i) => {
 			if (
-				cards.filter(cardNumber => card == cardNumber.value).length == 4 ||
-				cards.filter(cardFigure => uniqueFigure[i] == cardFigure.suit).length ==
+				cards.filter(cardNumber => card === cardNumber.value).length === 4 ||
+				cards.filter(cardFigure => uniqueFigure[i] === cardFigure.suit).length ===
 					4
 			) {
 				countCuarta++;
 			}
 		});
-		if (countCuarta==0 && validateEscalera(cards) == 4) {
+		if (countCuarta === 0 && validateEscalera(cards) === 4) {
 			countCuarta++;
 			isEscalera = true;
 		}
@@ -218,7 +218,7 @@ const GameProvider = ({ children }) => {
 			escalera:
 				validateCuarta(cards).isEscalera || validateTerna(cards).isEscalera,
 		};
-		if (results.terna == 2 && results.cuarta == 1) {
+		if (results.terna === 2 && results.cuarta === 1) {
 			if (results.escalera) {
 				return {
 					escalera: true,
