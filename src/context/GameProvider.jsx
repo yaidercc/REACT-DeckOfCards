@@ -174,7 +174,7 @@ const GameProvider = ({ children }) => {
 		const uniqueCards = cards.map(({ value, suit }) => ({ value, suit }));
 
 		const sortedCards = [];
-		const escalera = [];
+		let escalera = [];
 
 		uniqueCards.map((card, index) => {
 			const indexInRanks = cardsSimbols.indexOf(card.value);
@@ -195,19 +195,20 @@ const GameProvider = ({ children }) => {
 		sortedCards.map((card, i) => {
 			if (escalera.length < 3) {
 				let nextCard=card;
+				escalera=[];
 				escalera.push(card);
+				
 				sortedCards.map(cardSorts => {
-					// if (cardSorts.suit == card.suit) {
-					if (cardsSimbols.indexOf(cardSorts.value) - cardsSimbols.indexOf(nextCard.value) === 1) {
-						escalera.push(cardSorts);
-						nextCard=cardSorts;
-					}
-					// } else {
-					// 	return false;
-					// }
+					if (cardSorts.suit == nextCard.suit && escalera.some(cards=>cards.suit==nextCard.suit)) {
+						if (cardsSimbols.indexOf(cardSorts.value) - cardsSimbols.indexOf(nextCard.value) === 1) {
+							escalera.push(cardSorts);
+							nextCard=cardSorts;
+						}
+					} 
 				});
 			}
 		});
+		console.log(escalera);
 		return escalera.length;
 	};
 
