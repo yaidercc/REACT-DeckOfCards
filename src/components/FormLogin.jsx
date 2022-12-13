@@ -8,7 +8,6 @@ import { TfiGame } from 'react-icons/tfi';
 
 import { useNavigate } from 'react-router-dom';
 import useGame from '../hooks/useGame';
-import DeckOfCardsAPI from '../services/deckofcardsapi';
 
 const FormLogin = () => {
 	const { playerOne, setPlayerOne, playerTwo, setPlayerTwo, playGame} = useGame();
@@ -27,7 +26,7 @@ const FormLogin = () => {
 		if (form.checkValidity() === false) {
 			console.log(form);
 		} else {
-			if(playerOne.name!=playerTwo.name){
+			if(playerOne.name !== playerTwo.name){
 				await playGame();
 				navigate('/game', { replace: false });
 			}else{
@@ -81,7 +80,7 @@ const FormLogin = () => {
 					</InputGroup>
 				</Form.Group>
 			</Row>
-			<Button type='submit'>Login</Button>
+			<Button type='submit' variant = 'success'>Login</Button>
 		</Form>
 	);
 };
