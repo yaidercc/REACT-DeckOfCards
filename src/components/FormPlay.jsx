@@ -23,7 +23,7 @@ const FormPlay = () => {
 				playerOne: [],
 				playerTwo: [],
 			});
-			if (numCards == 1) {
+			if (numCards === 1) {
 				if (newCard.playerOne.length > 0) {
 					setNewCard({
 						...newCard,

@@ -198,7 +198,7 @@ const GameProvider = ({ children }) => {
 				escalera.push(card);
 				sortedCards.map(cardSorts => {
 					// if (cardSorts.suit == card.suit) {
-					if (cardsSimbols.indexOf(cardSorts.value) - cardsSimbols.indexOf(nextCard.value) == 1) {
+					if (cardsSimbols.indexOf(cardSorts.value) - cardsSimbols.indexOf(nextCard.value) === 1) {
 						escalera.push(cardSorts);
 						nextCard=cardSorts;
 					}
@@ -256,7 +256,7 @@ const GameProvider = ({ children }) => {
 				cardsRemaninig,
 				setcardsRemaninig,
 				turn,
-				setTurn,
+				setTurn
 			}}
 		>
 			{children}
