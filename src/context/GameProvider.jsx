@@ -174,10 +174,6 @@ const GameProvider = ({ children }) => {
 		});
 		console.log(sortedCards);
 		sortedCards.map((card, i) => {
-			// if (i < sortedCards.length - 1) {
-			// Get the index of the current and next ranks in the ranks array
-			// const currIndex = cardsSimbols.indexOf(sortedCards[i].value);
-			// const nextIndex = cardsSimbols.indexOf(sortedCards[i + 1].value);
 			if (escalera.length < 3) {
 				escalera = sortedCards.filter(cardSorts => {
 					if (cardSorts.suit == card.suit) {
@@ -201,34 +197,8 @@ const GameProvider = ({ children }) => {
 					}
 				});
 			}
-			// // If the difference between the indices is not 1, return false
-			// if (nextIndex - currIndex !== 1) {
-			// 	if (escalera.length < 3) {
-			// 		escalera = [];
-			// 		escalera.push(sortedCards[i + 1]);
-			// 	}
-			// } else {
-			// 	if (escalera.length < 3) {
-			// 		if (
-			// 			escalera.filter(
-			// 				cardEscalera => cardEscalera.suit == sortedCards[i + 1].suit
-			// 			).length == 0
-			// 		) {
-			// 			if(sortedCards[i + 1].suit==){
-
-			// 				escalera = [];
-			// 			}
-			// 		}
-			// 		escalera.push(sortedCards[i + 1]);
-			// 	}
-			// }
-			// }
 		});
-		console.log('result');
-		// console.log(escalera)
-		console.log('===============');
 		return escalera.length >= 3;
-		// return false;
 	};
 
 	const validateBaraja = cards => {
