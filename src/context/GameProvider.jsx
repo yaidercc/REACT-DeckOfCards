@@ -109,51 +109,6 @@ const GameProvider = ({ children }) => {
 		}
 	};
 
-	const validateTerna = cards => {
-		const numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10'];
-		const numberCards = cards
-			.filter(card => numbers.includes(card.value))
-			.sort((a, b) => a.value - b.value);
-		const uniqueCards = [
-			...new Set([...numberCards.map(({ value }) => value)]),
-		];
-		let countTerna = 0;
-		let isEscalera = false;
-		uniqueCards.forEach(card => {
-			if (
-				numberCards.filter(cardNumber => card == cardNumber.value).length == 3
-			) {
-				countTerna++;
-			} else {
-				if (validateEscalera(cards) == 3) {
-					countTerna++;
-					isEscalera = true;
-				}
-			}
-		});
-
-		return { countTerna, isEscalera };
-	};
-	const validateCuarta = cards => {
-		const uniqueValues = new Set([...cards.map(({ value }) => value)]);
-		const uniqueFigure = new Set([...cards.map(({ suit }) => suit)]);
-		let countCuarta = 0;
-		let isEscalera = false;
-		uniqueValues.forEach((card, i) => {
-			if (
-				cards.filter(cardNumber => card == cardNumber.value).length == 4 ||
-				cards.filter(cardFigure => uniqueFigure[i] == cardFigure.suit).length ==
-					4
-			) {
-				countCuarta++;
-			}
-		});
-		if (countCuarta==0 && validateEscalera(cards) == 4) {
-			countCuarta++;
-			isEscalera = true;
-		}
-		return { countCuarta, isEscalera };
-	};
 	const validateEscalera = cards => {
 		const cardsSimbols = [
 			'ACE',
@@ -174,7 +129,7 @@ const GameProvider = ({ children }) => {
 		const uniqueCards = cards.map(({ value, suit }) => ({ value, suit }));
 
 		const sortedCards = [];
-		const escalera = [];
+		let escalera = [];
 
 		uniqueCards.map((card, index) => {
 			const indexInRanks = cardsSimbols.indexOf(card.value);
@@ -193,22 +148,91 @@ const GameProvider = ({ children }) => {
 			}
 		});
 		sortedCards.map((card, i) => {
-			if (escalera.length < 3) {
-				let nextCard=card;
+			if (escalera.length < 4) {
+				let nextCard = card;
+				escalera = [];
 				escalera.push(card);
 				sortedCards.map(cardSorts => {
-					// if (cardSorts.suit == card.suit) {
-					if (cardsSimbols.indexOf(cardSorts.value) - cardsSimbols.indexOf(nextCard.value) == 1) {
-						escalera.push(cardSorts);
-						nextCard=cardSorts;
+					if (cardSorts.suit != card.suit) {
+						if (
+							cardsSimbols.indexOf(cardSorts.value) -
+								cardsSimbols.indexOf(nextCard.value) ==
+							1
+						) {
+							escalera.push(cardSorts);
+							nextCard = cardSorts;
+						}
 					}
-					// } else {
-					// 	return false;
-					// }
 				});
 			}
 		});
-		return escalera.length;
+		return escalera;
+	};
+	const validateTerna = cards => {
+		const numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10'];
+		const numberCards = cards
+			.filter(card => numbers.includes(card.value))
+			.sort((a, b) => a.value - b.value);
+		const uniqueNumbers = [...new Set(numberCards.map(({ value }) => value))];
+
+		let countTerna = 0;
+		const numbersTerna = [];
+		const noterna = [];
+		uniqueNumbers.map(card => {
+			const aux = numberCards.filter(cardNumber => card == cardNumber.value);
+			if (aux.length == 3) {
+				if (countTerna < 2) {
+					if (!numbersTerna.some(cardSearch => cardSearch.value == card)) {
+						numbersTerna.push(card);
+						countTerna++;
+					}
+				} else {
+					noterna.push(...aux);
+				}
+			} else {
+				noterna.push(...aux);
+			}
+		});
+		noterna.push(...cards.filter(card => !numbers.includes(card.value)));
+		return { countTerna, noterna };
+	};
+	const validateCuarta = cards => {
+		let countCuarta = 0;
+		const numbersCuarta = [];
+		let isEscalera = false;
+		const noCuarta = [];
+		let win = false;
+		cards.map((card, i) => {
+			if (
+				cards.filter(cardNumber => card.value == cardNumber.value).length == 4
+			) {
+				if (!numbersCuarta.includes(card.value)) {
+					numbersCuarta.push(card.value);
+					countCuarta++;
+				}
+			} else {
+				noCuarta.push(card);
+			}
+		});
+		if (countCuarta == 0) {
+			const { countTerna, noterna } = validateTerna(cards);
+			if (
+				countTerna == 2 &&
+				validateEscalera(cards).length == 4 &&
+				validateEscalera(noterna).length == validateEscalera(cards).length
+			) {
+				isEscalera = true;
+				win = true;
+			}
+		} else {
+			if (
+				validateTerna(cards).countTerna == validateTerna(noCuarta).countTerna &&
+				validateTerna(cards).countTerna == 2
+			) {
+				win = true;
+			}
+		}
+		return { isEscalera, win };
 	};
 
 	const validateBaraja = cards => {
