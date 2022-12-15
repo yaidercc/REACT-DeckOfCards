@@ -8,6 +8,7 @@ const FormPlay = () => {
 		setNewCard,
 		cardsRemaninig,
 		setcardsRemaninig,
+		setnewCardReady
 	} = useGame();
 	const handleClick = async () => {
 		const cards = await requestCards(2);
@@ -18,7 +19,9 @@ const FormPlay = () => {
 				playerOne: cards[0],
 				playerTwo: cards[1],
 			});
+			setnewCardReady(true)
 		} else {
+			setnewCardReady(false)
 			alert('No hay mas cartas en la baraja.');
 		}
 	};
