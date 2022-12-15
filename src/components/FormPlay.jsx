@@ -6,46 +6,20 @@ const FormPlay = () => {
 	const {
 		requestCards,
 		setNewCard,
-		newCard,
 		cardsRemaninig,
 		setcardsRemaninig,
 	} = useGame();
 	const handleClick = async () => {
+		const cards = await requestCards(2);
 		
-		let cards = null;
-		let numCards = 0;
-		if (!(newCard.playerOne.length > 0 && newCard.playerTwo.length > 0)) {
-			numCards = newCard.playerOne.length > 0 || newCard.playerTwo.length > 0 ? 1 : 2;
-			cards = await requestCards(numCards);
-		}
-		if (numCards > 0) {
+		if (cardsRemaninig > 0) {
+			setcardsRemaninig(cards[2]);
 			setNewCard({
-				playerOne: [],
-				playerTwo: [],
+				playerOne: cards[0],
+				playerTwo: cards[1],
 			});
-			if (numCards === 1) {
-				if (newCard.playerOne.length > 0) {
-					setNewCard({
-						...newCard,
-						playerTwo: [cards[0]],
-					});
-				} else {
-					setNewCard({
-						...newCard,
-						playerOne: [cards[0]],
-					});
-				}
-			} else {
-				setNewCard({
-					playerOne: cards[0],
-					playerTwo: cards[1],
-				});
-			}
-			if (cardsRemaninig > 0) {
-				setcardsRemaninig(cards[2]);
-			} else {
-				alert('No hay mas cartas en la baraja.');
-			}
+		} else {
+			alert('No hay mas cartas en la baraja.');
 		}
 	};
 	return (

@@ -37,8 +37,8 @@ const GameProvider = ({ children }) => {
 	}, [idGame]);
 
 	useEffect(() => {
-		validatePlayer1 = validateBaraja(playerOne.cards);
-		validatePlayer2 = validateBaraja(playerTwo.cards);
+		validatePlayer1 = validateCuarta(playerOne.cards);
+		validatePlayer2 = validateCuarta(playerTwo.cards);
 		if (validatePlayer1.win && validatePlayer2.win) {
 			setWin(true);
 			setShowToast(true);
@@ -51,6 +51,13 @@ const GameProvider = ({ children }) => {
 			}
 		}
 	}, [playerOne.cards, playerTwo.cards]);
+
+	useEffect(() => {
+		if (newCard.playerOne.length > 0) {
+			validateNewCard(playerOne.cards, 'playerOne', 1);
+			validateNewCard(playerTwo.cards, 'playerTwo', 2);
+		}
+	}, [newCard.playerOne, newCard.playerTwo]);
 
 	const playGame = async () => {
 		setIdGame(await DeckOfCardsAPI.getIdGame());
@@ -108,131 +115,257 @@ const GameProvider = ({ children }) => {
 			}
 		}
 	};
+	// write a code that validates if a set of poker cards has a fourth of a different suit
+	// const validateEscalera = cards => {
+	// 	const cardsSimbols = [
+	// 		'ACE',
+	// 		'2',
+	// 		'3',
+	// 		'4',
+	// 		'5',
+	// 		'6',
+	// 		'7',
+	// 		'8',
+	// 		'9',
+	// 		'10',
+	// 		'JACK',
+	// 		'QUEEN',
+	// 		'KING',
+	// 	];
 
+	// 	const uniqueCards = cards.map(({ value, suit }) => ({ value, suit }));
+
+	// 	const sortedCards = [];
+	// 	let escalera = [];
+
+	// 	uniqueCards.map((card, index) => {
+	// 		const indexInRanks = cardsSimbols.indexOf(card.value);
+	// 		if (index > 0) {
+	// 			let flag = true;
+	// 			for (let i = 0; i < index; i++) {
+	// 				if (cardsSimbols.indexOf(sortedCards[i].value) >= indexInRanks) {
+	// 					sortedCards.splice(i, 0, card);
+	// 					flag = false;
+	// 					break;
+	// 				}
+	// 			}
+	// 			if (flag) sortedCards.push(card);
+	// 		} else {
+	// 			sortedCards.push(card);
+	// 		}
+	// 	});
+	// 	// sortedCards.map((card, i) => {
+	// 	// 	if (escalera.length < 4) {
+	// 	// 		let nextCard = card;
+	// 	// 		escalera = [];
+	// 	// 		escalera.push(card);
+	// 	// 		sortedCards.map(cardSorts => {
+	// 	// 			if (cardSorts.suit != nextCard.suit) {
+	// 	// 				if (
+	// 	// 					cardsSimbols.indexOf(cardSorts.value) -
+	// 	// 						cardsSimbols.indexOf(nextCard.value) ==
+	// 	// 					1
+	// 	// 				) {
+	// 	// 					escalera.push(cardSorts);
+	// 	// 					nextCard = cardSorts;
+	// 	// 				}
+	// 	// 			}else{
+	// 	// 				escalera
+	// 	// 				nextCard = cardSorts;
+
+	// 	// 			}
+	// 	// 		});
+	// 	// 	}
+	// 	// });
+	// 	const copisortedCards=sortedCards;
+	// 	sortedCards.map((card, i) => {
+	// 		if (escalera.length < 4) {
+	// 			if(escalera.length>0) copisortedCards.shift();
+	// 			let nextCard = card;
+	// 			escalera = [];
+	// 			escalera.push(card);
+	// 			for (let i = 0; i < copisortedCards.length; i++) {
+	// 				if (copisortedCards[0].suit != nextCard.suit) {
+	// 					if (
+	// 						[1,-1].includes(cardsSimbols.indexOf(copisortedCards[0].value) -
+	// 						cardsSimbols.indexOf(nextCard.value))
+	// 					) {
+	// 						escalera.push(copisortedCards[0]);
+	// 						nextCard = copisortedCards[0];
+	// 					} else {
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 			// sortedCards.map(cardSorts => {
+
+	// 			// });
+	// 		}
+	// 	});
+	// 	return escalera;
+	// };
 	const validateTerna = cards => {
 		const numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10'];
 		const numberCards = cards
 			.filter(card => numbers.includes(card.value))
 			.sort((a, b) => a.value - b.value);
-		const uniqueCards = [
-			...new Set([...numberCards.map(({ value }) => value)]),
-		];
+		const uniqueNumbers = [...new Set(numberCards.map(({ value }) => value))];
+
 		let countTerna = 0;
-		let isEscalera = false;
-		uniqueCards.forEach(card => {
-			if (
-				numberCards.filter(cardNumber => card === cardNumber.value).length === 3
-			) {
-				countTerna++;
-			} else {
-				if (validateEscalera(cards) === 3) {
+		const numbersTerna = [];
+		const noterna = [];
+		const ternas = { terna1: [], terna2: [] };
+		uniqueNumbers.map(card => {
+			const aux = numberCards.filter(cardNumber => card == cardNumber.value);
+			if (aux.length == 3) {
+				if (countTerna < 2) {
+					countTerna == 1 ? (ternas.terna1 = aux) : (ternas.terna2 = aux);
 					countTerna++;
-					isEscalera = true;
 				}
+			} else {
+				noterna.push(...aux);
 			}
 		});
-
-		return { countTerna, isEscalera };
+		noterna.push(...cards.filter(card => !numbers.includes(card.value)));
+		return { countTerna, noterna, ternas };
 	};
 	const validateCuarta = cards => {
-		const uniqueValues = new Set([...cards.map(({ value }) => value)]);
-		const uniqueFigure = new Set([...cards.map(({ suit }) => suit)]);
 		let countCuarta = 0;
-		let isEscalera = false;
-		uniqueValues.forEach((card, i) => {
+		const numbersCuarta = [];
+		const isEscalera = false;
+		const noCuarta = [];
+		let win = false;
+		const results = {
+			terna1: [],
+			terna2: [],
+			cuarta: [],
+		};
+		for (let i = 0; i < cards.length; i++) {
 			if (
-				cards.filter(cardNumber => card === cardNumber.value).length === 4 ||
-				cards.filter(cardFigure => uniqueFigure[i] === cardFigure.suit).length ===
-					4
+				cards.filter(cardNumber => cards[i].value == cardNumber.value).length ==
+				4
 			) {
-				countCuarta++;
-			}
-		});
-		if (countCuarta === 0 && validateEscalera(cards) === 4) {
-			countCuarta++;
-			isEscalera = true;
-		}
-		return { countCuarta, isEscalera };
-	};
-	const validateEscalera = cards => {
-		const cardsSimbols = [
-			'ACE',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9',
-			'10',
-			'JACK',
-			'QUEEN',
-			'KING',
-		];
-
-		const uniqueCards = cards.map(({ value, suit }) => ({ value, suit }));
-
-		const sortedCards = [];
-		const escalera = [];
-
-		uniqueCards.map((card, index) => {
-			const indexInRanks = cardsSimbols.indexOf(card.value);
-			if (index > 0) {
-				let flag = true;
-				for (let i = 0; i < index; i++) {
-					if (cardsSimbols.indexOf(sortedCards[i].value) >= indexInRanks) {
-						sortedCards.splice(i, 0, card);
-						flag = false;
-						break;
-					}
+				if (!numbersCuarta.includes(cards[i].value)) {
+					numbersCuarta.push(cards[i].value);
+					countCuarta++;
+					results.cuarta = cards.filter(
+						cardNumber => cards[i].value == cardNumber.value
+					);
+					break;
 				}
-				if (flag) sortedCards.push(card);
 			} else {
-				sortedCards.push(card);
+				noCuarta.push(cards[i]);
 			}
-		});
-		sortedCards.map((card, i) => {
-			if (escalera.length < 3) {
-				let nextCard=card;
-				escalera.push(card);
-				sortedCards.map(cardSorts => {
-					// if (cardSorts.suit == card.suit) {
-					if (cardsSimbols.indexOf(cardSorts.value) - cardsSimbols.indexOf(nextCard.value) === 1) {
-						escalera.push(cardSorts);
-						nextCard=cardSorts;
-					}
-					// } else {
-					// 	return false;
-					// }
-				});
+		}
+		const { countTerna, noterna, ternas } = validateTerna(cards);
+		if (countCuarta == 0) {
+			if (countTerna >= 1) {
+				// isEscalera = true;
+				results.terna1 = ternas.terna1;
+				results.terna2 = ternas.terna2;
+				win = false;
 			}
-		});
-		return escalera.length;
+		} else {
+			if (countTerna == validateTerna(noCuarta).countTerna && countTerna == 2) {
+				results.terna1 = ternas.terna1;
+				results.terna2 = ternas.terna2;
+				win = true;
+			} else {
+				results.terna1 = ternas.terna1;
+				results.terna2 = ternas.terna2;
+				win = false;
+			}
+		}
+		return { isEscalera, win, results, noCuarta };
 	};
+
+	const validateNewCard = (cards = [], playerName, playerNumber) => {
+		const { win, isEscalera, results } = validateCuarta(cards);
+		const cardNew = newCard[playerName][0];
+		console.log(cardNew);
+		if (!win) {
+			// const someCard = cards.filter(card => card.value == cardNew.value);
+			// if (someCard.length > 0) {
+			// 	let uniqueValues = [];
+			// 	if (someCard.length > 2) {
+			// 		if (playerNumber == 1) {
+			// 			setPlayerOne([...replaceValue(cardNew, cards)]);
+			// 		} else {
+			// 			setPlayerTwo([...replaceValue(cardNew, cards)]);
+			// 		}
+			// 		alert("mayor a 2 ")
+			// 	} else {
+			// 		alert("menor a 2 ")
+			// 		uniqueValues = cards.filter(cardSearch => {
+			// 			if (
+			// 				cards.filter(card => card.value == cardSearch.value).length == 1
+			// 			) {
+			// 				return true;
+			// 			}
+			// 		});
+			// 		if (uniqueValues.length > 0) {
+			// 			const round = Math.random() * ((uniqueValues.length - 1) - 0) + 0;
+			// 			cards.splice(round, 1,cardNew);
+			// 		}
+			// 	}
+			// }
+			setNewCard({...newCard,[playerName]:[]});
+		}
+		return { win, isEscalera };
+	};
+
+	const replaceValue = (valueToReplace, cards) => {
+		let uniqueValues = cards.filter(cardSearch => {
+			if (cards.filter(card => card.value == cardSearch.value).length == 1) {
+				return true;
+			}
+		});
+
+		if (uniqueValues.length > 0) {
+			const round = Math.random() * ((uniqueValues.length - 1) - 0) + 0;
+			cards.splice(round, 1,valueToReplace);
+		} else {
+			uniqueValues = cards.filter(cardSearch => {
+				if (cards.filter(card => card.value == cardSearch.value).length <= 2) {
+					return true;
+				}
+			});
+			const round = Math.random() * ((uniqueValues.length - 1) - 0) + 0;
+			cards.splice(round, 1,valueToReplace);
+		}
+		return cards;
+	};
+
+	// const validateBaraja = cards => {
+	// 	const results = {
+	// 		terna: validateTerna(cards).countTerna,
+	// 		cuarta: validateCuarta(cards).countCuarta,
+	// 		escalera:
+	// 			validateCuarta(cards).isEscalera || validateTerna(cards).isEscalera,
+	// 	};
+	// 	if (results.terna == 2 && results.cuarta == 1) {
+	// 		if (results.escalera) {
+	// 			return {
+	// 				escalera: true,
+	// 				win: true,
+	// 			};
+	// 		}
+	// 		return {
+	// 			escalera: false,
+	// 			win: true,
+	// 		};
+	// 	}
+	// 	return {
+	// 		escalera: false,
+	// 		win: false,
+	// 	};
+	// };
 
 	const validateBaraja = cards => {
 		const results = {
-			terna: validateTerna(cards).countTerna,
-			cuarta: validateCuarta(cards).countCuarta,
-			escalera:
-				validateCuarta(cards).isEscalera || validateTerna(cards).isEscalera,
-		};
-		if (results.terna === 2 && results.cuarta === 1) {
-			if (results.escalera) {
-				return {
-					escalera: true,
-					win: true,
-				};
-			}
-			return {
-				escalera: false,
-				win: true,
-			};
-		}
-		return {
-			escalera: false,
-			win: false,
+			terna1: [],
+			terna2: [],
+			cuarta: [],
 		};
 	};
 
