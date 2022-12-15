@@ -16,25 +16,25 @@ const ListCards = () => {
 		setTurn,
 	} = useGame();
 
-	const handlewNewCard = (player, flag,playerName) => {
-		if (turn[player] > 0) {
-			if (flag) {
-				setacceptedCard({ ...acceptedCard, [player]: true });
-			} else {
-				setNewCard({
-					...newCard,
-					[player]: {},
-				});
-				setacceptedCard({ ...acceptedCard, [player]: false });
-			}
-			setTurn({
-				...turn,
-				[player]: turn[player] - 1,
-			});
-		}else{
-			alert(`No hay turnos disponibles para el jugador: ${playerName}`)
-		}
-	};
+	// const handlewNewCard = (player, flag, playerName) => {
+	// 	if (turn[player] > 0) {
+	// 		if (flag) {
+	// 			setacceptedCard({ ...acceptedCard, [player]: true });
+	// 		} else {
+	// 			setNewCard({
+	// 				...newCard,
+	// 				[player]: {},
+	// 			});
+	// 			setacceptedCard({ ...acceptedCard, [player]: false });
+	// 		}
+	// 		setTurn({
+	// 			...turn,
+	// 			[player]: turn[player] - 1,
+	// 		});
+	// 	}else{
+	// 		alert(`No hay turnos disponibles para el jugador: ${playerName}`)
+	// 	}
+	// };
 	return (
 		<>
 			<Container>
@@ -49,39 +49,6 @@ const ListCards = () => {
 									alt={newCard.playerOne[0]?.value}
 									height={200}
 								/>
-								{newCard.playerOne[0]?.image && (
-									<>
-										<div className='d-flex justify-content-around mt-3'>
-											<button
-												className='bg-transparent border none'
-												onClick={() =>
-													handlewNewCard(
-														'playerOne',
-														true,
-														playerOne.name
-													)
-												}
-											>
-												<BsFillCheckCircleFill className='fs-3 text-success' />
-											</button>
-											<button
-												className='bg-transparent border none'
-												onClick={() =>
-													handlewNewCard(
-														'playerOne',
-														false,
-														playerOne.name
-													)
-												}
-											>
-												<BsFillXCircleFill className='fs-3 text-danger' />
-											</button>
-										</div>
-										{acceptedCard.playerOne && (
-											<p className='animateText'>Selecciona una carta!</p>
-										)}
-									</>
-								)}
 							</div>
 						</Row>
 					</Col>
@@ -132,39 +99,6 @@ const ListCards = () => {
 									alt={newCard.playerTwo[0]?.value}
 									height={200}
 								/>
-								{newCard.playerTwo[0]?.image && (
-									<>
-										<div className='d-flex justify-content-evenly mt-3'>
-											<button
-												className='bg-transparent border none'
-												onClick={() =>
-													handlewNewCard(
-														'playerTwo',
-														true,
-														playerTwo.name
-													)
-												}
-											>
-												<BsFillCheckCircleFill className='fs-3 text-success' />
-											</button>
-											<button
-												className='bg-transparent border none'
-												onClick={() =>
-													handlewNewCard(
-														'playerTwo',
-														false,
-														playerTwo.name
-													)
-												}
-											>
-												<BsFillXCircleFill className='fs-3 text-danger' />
-											</button>
-										</div>
-										{acceptedCard.playerTwo && (
-											<p className='animateText'>Selecciona una carta!</p>
-										)}
-									</>
-								)}
 							</div>
 						</Row>
 					</Col>
