@@ -12,7 +12,9 @@ const GameProvider = ({ children }) => {
 		playerTwo: [],
 	});
 	const [cardsRemaninig, setcardsRemaninig] = useState(0);
+
 	const [newCardReady, setnewCardReady] = useState(false);
+
 	const [turn, setTurn] = useState({
 		playerOne: 16,
 		playerTwo: 16,
@@ -24,7 +26,6 @@ const GameProvider = ({ children }) => {
 
 	let validatePlayer1 = null;
 	let validatePlayer2 = null;
-	
 	const [playerOne, setPlayerOne] = useState({
 		name: '',
 		cards: [],
@@ -230,6 +231,7 @@ const GameProvider = ({ children }) => {
 		noterna.push(...cards.filter(card => !numbers.includes(card.value)));
 		return { countTerna, noterna, ternas };
 	};
+
 	const validateCuarta = cards => {
 		let countCuarta = 0;
 		const numbersCuarta = [];
@@ -246,14 +248,14 @@ const GameProvider = ({ children }) => {
 				cards.filter(cardNumber => cards[i].value == cardNumber.value).length ==
 				4
 			) {
-				if (!numbersCuarta.includes(cards[i].value)) {
-					numbersCuarta.push(cards[i].value);
-					countCuarta++;
-					results.cuarta = cards.filter(
-						cardNumber => cards[i].value == cardNumber.value
-					);
-					break;
-				}
+				// if (!numbersCuarta.includes(cards[i].value)) {
+				// numbersCuarta.push(cards[i].value);
+				countCuarta++;
+				results.cuarta = cards.filter(
+					cardNumber => cards[i].value == cardNumber.value
+				);
+				// break;
+				// }
 			} else {
 				noCuarta.push(cards[i]);
 			}
@@ -292,26 +294,17 @@ const GameProvider = ({ children }) => {
 						cards = replaceValue(cardNew, cards);
 					} else if (someCard.length <= 2) {
 						uniqueValues = cards.filter(cardSearch => {
-							if (
-								cards.filter(card => card.value == cardSearch.value).length ==
-									1 &&
-								cardSearch.value != cardNew?.value
-							) {
+							if (cards.filter(card => card.value == cardSearch.value).length ==1 && cardSearch.value != cardNew?.value) {
 								return true;
 							}
 						});
 						if (uniqueValues.length > 0) {
 							const round = Math.random() * (uniqueValues.length - 1 - 0) + 0;
-							console.log('sorteados: ' + playerName);
-							console.log(uniqueValues);
 							cards.splice(round, 1, cardNew);
 						}
 					}
 					let { win, isEscalera, results } = validateCuarta(cards);
-					console.log(results);
 				}
-
-				// setNewCard({ ...newCard, [playerName]: [] });
 			}
 		}
 		return { win, isEscalera };
@@ -345,39 +338,6 @@ const GameProvider = ({ children }) => {
 			cards.splice(round, 1, valueToReplace);
 		}
 		return cards;
-	};
-
-	// const validateBaraja = cards => {
-	// 	const results = {
-	// 		terna: validateTerna(cards).countTerna,
-	// 		cuarta: validateCuarta(cards).countCuarta,
-	// 		escalera:
-	// 			validateCuarta(cards).isEscalera || validateTerna(cards).isEscalera,
-	// 	};
-	// 	if (results.terna == 2 && results.cuarta == 1) {
-	// 		if (results.escalera) {
-	// 			return {
-	// 				escalera: true,
-	// 				win: true,
-	// 			};
-	// 		}
-	// 		return {
-	// 			escalera: false,
-	// 			win: true,
-	// 		};
-	// 	}
-	// 	return {
-	// 		escalera: false,
-	// 		win: false,
-	// 	};
-	// };
-
-	const validateBaraja = cards => {
-		const results = {
-			terna1: [],
-			terna2: [],
-			cuarta: [],
-		};
 	};
 
 	return (
