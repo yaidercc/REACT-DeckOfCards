@@ -7,8 +7,12 @@ const GameProvider = ({ children }) => {
 	const [win, setWin] = useState(false);
 	const [showToast, setShowToast] = useState(false);
 	const [winName, setWinName] = useState('');
-	const [newCard, setNewCard] = useState({ playerOne: [], playerTwo: [] });
+	const [newCard, setNewCard] = useState({
+		playerOne: [],
+		playerTwo: [],
+	});
 	const [cardsRemaninig, setcardsRemaninig] = useState(0);
+	const [newCardReady, setnewCardReady] = useState(false);
 	const [turn, setTurn] = useState({
 		playerOne: 16,
 		playerTwo: 16,
@@ -20,6 +24,7 @@ const GameProvider = ({ children }) => {
 
 	let validatePlayer1 = null;
 	let validatePlayer2 = null;
+	
 	const [playerOne, setPlayerOne] = useState({
 		name: '',
 		cards: [],
@@ -39,25 +44,21 @@ const GameProvider = ({ children }) => {
 	useEffect(() => {
 		validatePlayer1 = validateCuarta(playerOne.cards);
 		validatePlayer2 = validateCuarta(playerTwo.cards);
-		if (validatePlayer1.win && validatePlayer2.win) {
+
+		if (validatePlayer1.win || validatePlayer2.win) {
 			setWin(true);
 			setShowToast(true);
-			setWinName(validatePlayer1.isEscalera ? playerOne.name : playerTwo.name);
-		} else {
-			if (validatePlayer1.win || validatePlayer2.win) {
-				setWin(true);
-				setShowToast(true);
-				setWinName(validatePlayer1.win ? playerOne.name : playerTwo.name);
-			}
+			setWinName(validatePlayer1.win ? playerOne.name : playerTwo.name);
 		}
 	}, [playerOne.cards, playerTwo.cards]);
 
 	useEffect(() => {
-		if (newCard.playerOne.length > 0) {
+		if (newCardReady) {
 			validateNewCard(playerOne.cards, 'playerOne', 1);
 			validateNewCard(playerTwo.cards, 'playerTwo', 2);
+			setnewCardReady(false);
 		}
-	}, [newCard.playerOne, newCard.playerTwo]);
+	}, [newCardReady]);
 
 	const playGame = async () => {
 		setIdGame(await DeckOfCardsAPI.getIdGame());
@@ -280,58 +281,68 @@ const GameProvider = ({ children }) => {
 	};
 
 	const validateNewCard = (cards = [], playerName, playerNumber) => {
-		const { win, isEscalera, results } = validateCuarta(cards);
-		const cardNew = newCard[playerName][0];
-		console.log(cardNew);
-		if (!win) {
-			// const someCard = cards.filter(card => card.value == cardNew.value);
-			// if (someCard.length > 0) {
-			// 	let uniqueValues = [];
-			// 	if (someCard.length > 2) {
-			// 		if (playerNumber == 1) {
-			// 			setPlayerOne([...replaceValue(cardNew, cards)]);
-			// 		} else {
-			// 			setPlayerTwo([...replaceValue(cardNew, cards)]);
-			// 		}
-			// 		alert("mayor a 2 ")
-			// 	} else {
-			// 		alert("menor a 2 ")
-			// 		uniqueValues = cards.filter(cardSearch => {
-			// 			if (
-			// 				cards.filter(card => card.value == cardSearch.value).length == 1
-			// 			) {
-			// 				return true;
-			// 			}
-			// 		});
-			// 		if (uniqueValues.length > 0) {
-			// 			const round = Math.random() * ((uniqueValues.length - 1) - 0) + 0;
-			// 			cards.splice(round, 1,cardNew);
-			// 		}
-			// 	}
-			// }
-			setNewCard({...newCard,[playerName]:[]});
+		let { win, isEscalera, results } = validateCuarta(cards);
+		if (newCardReady) {
+			const cardNew = newCard[playerName][0];
+			if (!win) {
+				const someCard = cards.filter(card => card.value == cardNew?.value);
+				if (someCard.length > 0) {
+					let uniqueValues = [];
+					if (someCard.length > 2) {
+						cards = replaceValue(cardNew, cards);
+					} else if (someCard.length <= 2) {
+						uniqueValues = cards.filter(cardSearch => {
+							if (
+								cards.filter(card => card.value == cardSearch.value).length ==
+									1 &&
+								cardSearch.value != cardNew?.value
+							) {
+								return true;
+							}
+						});
+						if (uniqueValues.length > 0) {
+							const round = Math.random() * (uniqueValues.length - 1 - 0) + 0;
+							console.log('sorteados: ' + playerName);
+							console.log(uniqueValues);
+							cards.splice(round, 1, cardNew);
+						}
+					}
+					let { win, isEscalera, results } = validateCuarta(cards);
+					console.log(results);
+				}
+
+				// setNewCard({ ...newCard, [playerName]: [] });
+			}
 		}
 		return { win, isEscalera };
 	};
 
 	const replaceValue = (valueToReplace, cards) => {
 		let uniqueValues = cards.filter(cardSearch => {
-			if (cards.filter(card => card.value == cardSearch.value).length == 1) {
+			if (
+				cards.filter(card => card.value == cardSearch.value).length == 1 &&
+				cardSearch.value != valueToReplace.value
+			) {
 				return true;
+			} else {
+				return false;
 			}
 		});
 
 		if (uniqueValues.length > 0) {
-			const round = Math.random() * ((uniqueValues.length - 1) - 0) + 0;
-			cards.splice(round, 1,valueToReplace);
+			const round = Math.random() * (uniqueValues.length - 1 - 0) + 0;
+			cards.splice(round, 1, valueToReplace);
 		} else {
 			uniqueValues = cards.filter(cardSearch => {
-				if (cards.filter(card => card.value == cardSearch.value).length <= 2) {
+				if (
+					cards.filter(card => card.value == cardSearch.value).length <= 2 &&
+					cardSearch.value != valueToReplace.value
+				) {
 					return true;
 				}
 			});
-			const round = Math.random() * ((uniqueValues.length - 1) - 0) + 0;
-			cards.splice(round, 1,valueToReplace);
+			const round = Math.random() * (uniqueValues.length - 1 - 0) + 0;
+			cards.splice(round, 1, valueToReplace);
 		}
 		return cards;
 	};
@@ -389,7 +400,8 @@ const GameProvider = ({ children }) => {
 				cardsRemaninig,
 				setcardsRemaninig,
 				turn,
-				setTurn
+				setTurn,
+				setnewCardReady,
 			}}
 		>
 			{children}
